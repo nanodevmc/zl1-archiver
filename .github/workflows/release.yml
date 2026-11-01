@@ -38,11 +38,16 @@ jobs:
           targets: ${{ matrix.target }}
       - name: Build target
         run: cargo build --release --target ${{ matrix.target }} -p zl1-cli
+      - name: Rename binary for uniqueness
+        shell: bash
+        run: |
+          mkdir -p out
+          cp target/${{ matrix.target }}/release/${{ matrix.bin }} out/${{ matrix.artifact }}${{ matrix.os == 'windows-latest' && '.exe' || '' }}
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: target/${{ matrix.target }}/release/${{ matrix.bin }}
+          path: out/*
 
   build-cross-linux-arm64:
     runs-on: ubuntu-latest
@@ -57,11 +62,15 @@ jobs:
         env:
           CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
         run: cargo build --release --target aarch64-unknown-linux-gnu -p zl1-cli
+      - name: Rename binary
+        run: |
+          mkdir -p out
+          cp target/aarch64-unknown-linux-gnu/release/zl1-cli out/zl1-linux-arm64
       - name: Upload Linux ARM64
         uses: actions/upload-artifact@v4
         with:
           name: zl1-linux-arm64
-          path: target/aarch64-unknown-linux-gnu/release/zl1-cli
+          path: out/*
 
   build-termux-android:
     runs-on: ubuntu-latest
@@ -83,11 +92,13 @@ jobs:
           export AR_aarch64_linux_android=$TOOLCHAIN/bin/llvm-ar
           export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$TOOLCHAIN/bin/aarch64-linux-android24-clang
           cargo build --release --target aarch64-linux-android -p zl1-cli
+          mkdir -p out
+          cp target/aarch64-linux-android/release/zl1-cli out/zl1-termux-arm64
       - name: Upload Termux Binaries
         uses: actions/upload-artifact@v4
         with:
           name: zl1-termux-android
-          path: target/aarch64-linux-android/release/zl1-cli
+          path: out/*
 
   upload-release-apk:
     runs-on: ubuntu-latest
@@ -105,10 +116,12 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release_assets
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          files: |
-            */*
+          files: release_assets/**/*
