@@ -1,0 +1,9 @@
+[package]
+name = "zl1-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rcgen = "0.14.10"
+zip = "9.1.3"
+zl1-core = { path = "../zl1-core" }

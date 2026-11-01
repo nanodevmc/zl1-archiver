@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gradBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141923" />
+      <stop offset="100%" stop-color="#070a0e" />
+    </linearGradient>
+    <linearGradient id="gradNeon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00FFA3" />
+      <stop offset="100%" stop-color="#00B8FF" />
+    </linearGradient>
+    <linearGradient id="gradAcc" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF3366" />
+      <stop offset="100%" stop-color="#FF9900" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background rounded plate -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="url(#gradBg)" stroke="#222f3e" stroke-width="6" />
+
+  <!-- Compression Vise / Clamps (Top and Bottom) -->
+  <path d="M 120 110 L 392 110 L 372 150 L 140 150 Z" fill="#2c3e50" stroke="#48dbfb" stroke-width="3" />
+  <path d="M 120 402 L 392 402 L 372 362 L 140 362 Z" fill="#2c3e50" stroke="#48dbfb" stroke-width="3" />
+
+  <!-- Compression Arrows inwards -->
+  <polygon points="256,190 236,160 276,160" fill="url(#gradNeon)" />
+  <polygon points="256,322 236,352 276,352" fill="url(#gradNeon)" />
+
+  <!-- High-Density Cube / Core -->
+  <rect x="186" y="206" width="140" height="100" rx="16" fill="#111722" stroke="url(#gradNeon)" stroke-width="4" filter="url(#glow)" />
+
+  <!-- ZL1 Lettering -->
+  <text x="256" y="272" font-family="'Segoe UI', 'Roboto', 'Arial Black', sans-serif" font-size="52" font-weight="900" fill="url(#gradNeon)" text-anchor="middle" letter-spacing="2">ZL1</text>
+
+  <!-- Badge 500x Max Density indicator -->
+  <rect x="180" y="420" width="152" height="34" rx="17" fill="url(#gradAcc)" />
+  <text x="256" y="443" font-family="'Segoe UI', 'Roboto', sans-serif" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">500x SOLID</text>
+</svg>

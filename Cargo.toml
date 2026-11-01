@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "zl1-core",
+    "zl1-cli"
+, "zl1-gui"]
+resolver = "2"

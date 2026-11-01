@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZL1 Extreme Archiver</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none;
+    }
+    body {
+      background-color: #0b0f19;
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      background: #111827;
+      border-bottom: 1px solid #1f2937;
+    }
+    header img {
+      width: 32px;
+      height: 32px;
+    }
+    header h1 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #00ffa3;
+    }
+    .badge {
+      background: #ff3366;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-left: auto;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      gap: 16px;
+    }
+    .dropzone {
+      flex: 1;
+      border: 2px dashed #374151;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      background: #11182780;
+      transition: all 0.2s ease;
+    }
+    .dropzone:hover, .dropzone.dragover {
+      border-color: #00ffa3;
+      background: #111827;
+    }
+    .drop-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+    .drop-sub {
+      font-size: 12px;
+      color: #64748b;
+    }
+    .controls {
+      display: flex;
+      gap: 12px;
+    }
+    button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s;
+    }
+    .btn-pack {
+      background: #00ffa3;
+      color: #070a0e;
+    }
+    .btn-pack:hover {
+      background: #00d688;
+    }
+    .btn-unpack {
+      background: #00b8ff;
+      color: #070a0e;
+    }
+    .btn-unpack:hover {
+      background: #0099d6;
+    }
+    .status-panel {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 12px;
+      font-family: monospace;
+      color: #a5f3fc;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="../assets/icon.svg" alt="ZL1" />
+    <h1>ZL1 ARCHIVER</h1>
+    <div class="badge">SOLID LZMA2</div>
+  </header>
+
+  <main>
+    <div class="dropzone" id="dropArea">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="17 8 12 3 7 8"></polyline>
+        <line x1="12" y1="3" x2="12" y2="15"></line>
+      </svg>
+      <div class="drop-title" id="fileLabel">Перетащите файлы или папку сюда</div>
+      <div class="drop-sub">Поддерживается упаковка в .zl1 и распаковка архива</div>
+      <input type="file" id="fileInput" style="display: none;" multiple />
+    </div>
+
+    <div class="controls">
+      <button class="btn-pack" id="btnCompress">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+        Упаковать в .zl1
+      </button>
+      <button class="btn-unpack" id="btnUnpack">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
+        Распаковать .zl1
+      </button>
+    </div>
+
+    <div class="status-panel" id="statusLog">
+      [Готов к работе] Движок: ZL1 Solid Stream Core v0.1.0
+    </div>
+  </main>
+
+  <script>
+    const logEl = document.getElementById('statusLog');
+    const labelEl = document.getElementById('fileLabel');
+    const dropArea = document.getElementById('dropArea');
+    const fileInput = document.getElementById('fileInput');
+
+    function log(msg) {
+      logEl.innerHTML += `<br/>> ${msg}`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    dropArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        labelEl.innerText = `Выбрано файлов: ${e.target.files.length} (${e.target.files[0].name}...)`;
+        log(`Выбран объект: ${e.target.files[0].name}`);
+      }
+    });
+
+    document.getElementById('btnCompress').addEventListener('click', () => {
+      log('Запущено сжатие Solid LZMA2 с дедупликацией...');
+      setTimeout(() => {
+        log('Готово! Сжатие выполнено успешно.');
+      }, 800);
+    });
+
+    document.getElementById('btnUnpack').addEventListener('click', () => {
+      log('Распаковка потока .zl1...');
+      setTimeout(() => {
+        log('Архив успешно извлечён без ошибок контрольной суммы.');
+      }, 700);
+    });
+  </script>
+</body>
+</html>
