@@ -75,9 +75,14 @@ jobs:
           ndk-version: r26d
           add-to-path: true
       - name: Build Android Termux CLI
-        env:
-          CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER: aarch64-linux-android24-clang
-        run: cargo build --release --target aarch64-linux-android -p zl1-cli
+        run: |
+          TOOLCHAIN=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64
+          export PATH=$TOOLCHAIN/bin:$PATH
+          export CC_aarch64_linux_android=$TOOLCHAIN/bin/aarch64-linux-android24-clang
+          export CXX_aarch64_linux_android=$TOOLCHAIN/bin/aarch64-linux-android24-clang++
+          export AR_aarch64_linux_android=$TOOLCHAIN/bin/llvm-ar
+          export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$TOOLCHAIN/bin/aarch64-linux-android24-clang
+          cargo build --release --target aarch64-linux-android -p zl1-cli
       - name: Upload Termux Binaries
         uses: actions/upload-artifact@v4
         with:
